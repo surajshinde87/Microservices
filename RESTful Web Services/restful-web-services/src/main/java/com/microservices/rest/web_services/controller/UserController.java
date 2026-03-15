@@ -1,9 +1,14 @@
 package com.microservices.rest.web_services.controller;
 
 import com.microservices.rest.web_services.dao.UserDao;
+import com.microservices.rest.web_services.exceptions.UserNotFoundException;
 import com.microservices.rest.web_services.modal.User;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -23,13 +28,29 @@ public class UserController {
 
     @GetMapping("/users/{id}")
     public User retriveUser(@PathVariable int id){
-        return users.findOne(id);
+        User  user = users.findOne(id);
+
+        if (user == null){
+            throw new UserNotFoundException("id:" + id);
+        }
+
+        return  user;
     }
 
     @PostMapping("/users")
-    public void createUser(@RequestBody User user){
-     users.save(user);
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user){
+     User savedUser = users.save(user);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(savedUser.getId())
+                .toUri();
+     return  ResponseEntity.created(location).build();
     }
 
+    @DeleteMapping("/users/{id}")
+    public void deleteUser(@PathVariable int id){
+         users.deleteById(id);
+    }
 
 }

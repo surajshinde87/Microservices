@@ -9,7 +9,7 @@ public class RestfulWebServicesApplication {
 	public static void main(String[] args) {
 
         SpringApplication.run(RestfulWebServicesApplication.class, args);
-        System.out.println("Applicaton is Started");
+        System.out.println("Application is Started");
 	}
 
 }
